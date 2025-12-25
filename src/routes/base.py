@@ -1,23 +1,18 @@
-from fastapi import FastAPI, APIRouter
-import dotenv
+from fastapi import FastAPI, APIRouter, Depends
 import logging
-import os
+from ..helpers.config import load_settings, Settings
 
 router = APIRouter(
     prefix="/api/v1",
     tags=["Base"],
 )
 
-
-dotenv.load_dotenv()
-
-title = os.getenv("APP_NAME", "My FastAPI Application")
-version = os.getenv("APP_VERSION", "1.0.0")
-
 logger = logging.getLogger(__name__)
 
 @router.get("/")
-async def read_root():
+async def read_root(settings: Settings = Depends(load_settings)):
+    title = settings.APP_NAME
+    version = settings.APP_VERSION
     text = f"Welcome to the {title} application! Version: {version}"
     logger.info(text)
     return {
